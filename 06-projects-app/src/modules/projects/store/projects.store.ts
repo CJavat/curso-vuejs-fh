@@ -64,7 +64,7 @@ export const useProjectsStore = defineStore('projects', () => {
       return projects.value.map((p) => {
         const total = p.tasks.length;
         const compleated = p.tasks.filter((t) => t.completedAt).length;
-        const completion = Math.round((compleated / total) * 100);
+        const completion = total === 0 ? 0 : Math.round((compleated / total) * 100);
 
         return {
           id: p.id,
