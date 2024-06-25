@@ -6,6 +6,4 @@ const tesloApi = axios.create({
 
 //TODO: Interceptors
 
-console.log(import.meta.env);
-
 export { tesloApi };
