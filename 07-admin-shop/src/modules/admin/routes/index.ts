@@ -14,5 +14,16 @@ export const adminRoutes: RouteRecordRaw = {
       name: 'admin-dashboard',
       component: () => import('@/modules/admin/views/DashboardView.vue'),
     },
+    {
+      path: 'products',
+      name: 'admin-products',
+      component: () => import('@/modules/admin/views/ProductsView.vue'),
+    },
+    {
+      path: 'product/:productId',
+      name: 'admin-product',
+      props: true, //? Funciona para que el parametro (productId) pueda ser tomado en las props de la ruta.
+      component: () => import('@/modules/admin/views/ProductView.vue'),
+    },
   ],
 };
