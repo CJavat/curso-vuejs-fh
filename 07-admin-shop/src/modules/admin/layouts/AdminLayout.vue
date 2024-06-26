@@ -172,7 +172,7 @@
           class="flex items-center flex-shrink-0 h-10 px-2 text-sm font-medium rounded hover:bg-gray-300"
           to="/admin/products"
         >
-          <span class="leading-none">Productoss</span>
+          <span class="leading-none">Productos</span>
         </RouterLink>
         <a
           class="flex items-center flex-shrink-0 h-10 px-2 text-sm font-medium rounded hover:bg-gray-300"

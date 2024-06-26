@@ -1,13 +1,16 @@
-import { defineComponent, watchEffect } from 'vue';
+import { defineComponent, watchEffect, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useForm } from 'vee-validate';
+import { useFieldArray, useForm } from 'vee-validate';
 import { useQuery } from '@tanstack/vue-query';
 import * as yup from 'yup';
+
+import CustomInput from '@/modules/common/components/CustomInput.vue';
+import CustomTextArea from '@/modules/common/components/CustomTextArea.vue';
 
 import { getProductById } from '@/modules/products/actions';
 
 const validationSchema = yup.object({
-  title: yup.string().required(),
+  title: yup.string().required().min(3),
   slug: yup.string().required(),
   description: yup.string().required(),
   price: yup.number().required(),
@@ -16,6 +19,10 @@ const validationSchema = yup.object({
 });
 
 export default defineComponent({
+  components: {
+    CustomInput,
+    CustomTextArea,
+  },
   props: {
     productId: {
       type: String,
@@ -36,7 +43,10 @@ export default defineComponent({
       retry: false,
     });
 
-    const { values, defineField, errors } = useForm({ validationSchema });
+    const { values, defineField, errors, handleSubmit, resetForm } = useForm({
+      validationSchema,
+      initialValues: product.value,
+    });
 
     const [title, titleAttrs] = defineField('title');
     const [slug, slugAttrs] = defineField('slug');
@@ -45,12 +55,45 @@ export default defineComponent({
     const [stock, stockAttrs] = defineField('stock');
     const [gender, genderAttrs] = defineField('gender');
 
+    const { fields: sizes, remove: removeSize, push: pushSize } = useFieldArray<string>('sizes');
+    const { fields: images } = useFieldArray<string>('images');
+
+    const onSubmit = handleSubmit((value) => {
+      console.log({ value });
+    });
+
+    const toggleSize = (size: string) => {
+      const currentSizes = sizes.value.map((s) => s.value);
+      const hasSize = currentSizes.includes(size);
+
+      if (hasSize) {
+        removeSize(currentSizes.indexOf(size));
+      } else {
+        pushSize(size);
+      }
+    };
+
     watchEffect(() => {
       if (isError.value && isLoading.value === false) {
         router.replace('/admin/products');
         return;
       }
     });
+
+    watch(
+      product,
+      () => {
+        if (!product) return;
+
+        resetForm({
+          values: product.value,
+        });
+      },
+      {
+        deep: true,
+        immediate: true,
+      },
+    );
 
     return {
       //* Properties
@@ -71,10 +114,20 @@ export default defineComponent({
       gender,
       genderAttrs,
 
+      sizes,
+      images,
+
       //* Getter
       allSizes: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
 
       //* Actions
+      onSubmit,
+      toggleSize,
+
+      hasSize: (size: string) => {
+        const currentSizes = sizes.value.map((s) => s.value);
+        return currentSizes.includes(size);
+      },
     };
   },
 });
