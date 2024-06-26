@@ -2,7 +2,7 @@ import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { useLocalStorage } from '@vueuse/core';
 
-import { loginAction, registerAction } from '../actions';
+import { checkAuthAction, loginAction, registerAction } from '../actions';
 
 import { AuthStatus, type User } from '../interfaces';
 
@@ -52,10 +52,30 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   const logOut = () => {
+    localStorage.removeItem('token');
+
     authStatus.value = AuthStatus.Unauthenticated;
     user.value = undefined;
     token.value = '';
     return false;
+  };
+
+  const checkAuthStatus = async (): Promise<boolean> => {
+    try {
+      const statusResp = await checkAuthAction();
+      if (!statusResp.ok) {
+        logOut();
+        return false;
+      }
+
+      authStatus.value = AuthStatus.Authenticated;
+      user.value = statusResp.user;
+      token.value = statusResp.token;
+      return true;
+    } catch (error) {
+      logOut();
+      return false;
+    }
   };
 
   return {
@@ -67,13 +87,13 @@ export const useAuthStore = defineStore('auth', () => {
     isChecking: computed(() => authStatus.value === AuthStatus.Checking),
     isAuthenticated: computed(() => authStatus.value === AuthStatus.Authenticated),
 
-    //TODO: Getter para saber si es un admin o no
-
+    isAdmin: computed(() => user.value?.roles.includes('admin') ?? false),
     userName: computed(() => user.value?.fullName),
 
     // Actions
     login,
     register,
     logOut,
+    checkAuthStatus,
   };
 });
