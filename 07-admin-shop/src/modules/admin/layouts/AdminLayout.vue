@@ -115,7 +115,7 @@
         </svg>
       </a>
       <a
-        class="flex items-center justify-center flex-shrink-0 w-10 h-10 mt-4 mt-auto rounded hover:bg-gray-300"
+        class="flex items-center justify-center flex-shrink-0 w-10 h-10 mt-4 rounded hover:bg-gray-300"
         href="#"
       >
         <svg
@@ -198,9 +198,9 @@
         >
           <span class="leading-none">Item 6</span>
         </a>
-        <a
+        <RouterLink
+          to="/admin/product/create"
           class="flex items-center flex-shrink-0 h-10 px-3 mt-auto text-sm font-medium bg-blue-500 rounded hover:bg-blue-700 text-white"
-          href="#"
         >
           <svg
             class="w-5 h-5"
@@ -217,7 +217,7 @@
             />
           </svg>
           <span class="ml-2 leading-none">Nuevo Producto</span>
-        </a>
+        </RouterLink>
       </div>
     </div>
     <div class="flex flex-col flex-grow">
