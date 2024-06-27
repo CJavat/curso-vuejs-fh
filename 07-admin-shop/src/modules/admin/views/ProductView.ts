@@ -43,9 +43,9 @@ export default defineComponent({
       retry: false,
     });
 
-    const { values, defineField, errors, handleSubmit, resetForm } = useForm({
+    const { values, defineField, errors, handleSubmit, resetForm, meta } = useForm({
       validationSchema,
-      initialValues: product.value,
+      // initialValues: product.value,
     });
 
     const [title, titleAttrs] = defineField('title');
@@ -99,6 +99,7 @@ export default defineComponent({
       //* Properties
       values,
       errors,
+      meta,
 
       // VEE-VALIDATE
       title,
