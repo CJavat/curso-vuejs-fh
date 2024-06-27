@@ -3,15 +3,19 @@ import type { Product } from '../interfaces/product.interface';
 
 export const createUpdateProductAction = async (product: Partial<Product>) => {
   const productId = product.id;
-  const cleanProduct = cleanProductForCreateUpdate(product);
+
+  const newImages = await uploadImages(product.images ?? []);
+  product.images = newImages;
+
+  product = cleanProductForCreateUpdate(product);
 
   if (productId && productId !== '') {
     // Actualizar producto.
-    return await updateProduct(productId, cleanProduct);
+    return await updateProduct(productId, product);
   }
 
   // Crear producto
-  return await createProduct(cleanProduct);
+  return await createProduct(product);
 };
 
 const cleanProductForCreateUpdate = (product: Partial<Product>) => {
@@ -51,4 +55,26 @@ const createProduct = async (product: Partial<Product>) => {
     console.log(error);
     throw new Error('No se pudo crear el producto');
   }
+};
+
+const uploadImages = async (images: (string | File)[]) => {
+  const filesToUpload = images.filter((image) => image instanceof File) as File[];
+  const currentImages = images.filter((image) => typeof image === 'string') as string[];
+
+  const uploadPromises = filesToUpload.map(async (file) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const { data } = await tesloApi.post<{ secureUrl: string }>('/files/product', formData);
+
+      return data.secureUrl;
+    } catch (error) {
+      console.log(error);
+      throw new Error('No se pudieron subir las imágenes');
+    }
+  });
+
+  const uploadedImages = await Promise.all(uploadPromises);
+  return [...currentImages, ...uploadedImages];
 };

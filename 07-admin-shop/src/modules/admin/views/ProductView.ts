@@ -1,4 +1,4 @@
-import { defineComponent, watchEffect, watch } from 'vue';
+import { defineComponent, watchEffect, watch, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toastification';
 import { useFieldArray, useForm } from 'vee-validate';
@@ -72,10 +72,17 @@ export default defineComponent({
 
     const { fields: sizes, remove: removeSize, push: pushSize } = useFieldArray<string>('sizes');
     const { fields: images } = useFieldArray<string>('images');
+    const imageFiles = ref<File[]>([]);
 
     const onSubmit = handleSubmit((values) => {
       // console.log({ value });
-      mutate(values);
+
+      const formValues = {
+        ...values,
+        images: [...values.images, ...imageFiles.value],
+      };
+
+      mutate(formValues);
     });
 
     const toggleSize = (size: string) => {
@@ -86,6 +93,17 @@ export default defineComponent({
         removeSize(currentSizes.indexOf(size));
       } else {
         pushSize(size);
+      }
+    };
+
+    const onFilesChange = (event: Event) => {
+      const filesInput = event.target as HTMLInputElement;
+      const filesList = filesInput.files;
+
+      if (!filesList || filesList.length === 0) return;
+
+      for (const imageFile of filesList) {
+        imageFiles.value.push(imageFile);
       }
     };
 
@@ -120,6 +138,7 @@ export default defineComponent({
       resetForm({
         values: updatedProduct.value,
       });
+      imageFiles.value = [];
     });
 
     watch(
@@ -151,6 +170,7 @@ export default defineComponent({
 
       sizes,
       images,
+      imageFiles,
 
       isPending,
 
@@ -160,10 +180,14 @@ export default defineComponent({
       //* Actions
       onSubmit,
       toggleSize,
+      onFilesChange,
 
       hasSize: (size: string) => {
         const currentSizes = sizes.value.map((s) => s.value);
         return currentSizes.includes(size);
+      },
+      temporalImageURL: (imageFile: File) => {
+        return URL.createObjectURL(imageFile);
       },
     };
   },
