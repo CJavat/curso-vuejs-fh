@@ -1,4 +1,4 @@
-# Curso de VueJS con el profesor Fernando herrera.
+# Curso de VueJS con el profesor Fernando Herrera.
 
 <p align="center">
   <a href="https://vuejs.org/" target="blank"><img src="https://certificates.dev/images/vuejs/vuejs-badge.svg" width="200" alt="Vuejs Logo" /></a>
